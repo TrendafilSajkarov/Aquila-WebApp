@@ -4,7 +4,6 @@ const slugify = require("slugify");
 const CategorySchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please add name"],
     unique: true,
     maxlength: [30, "Name of Category can not be more than 30 characters"]
   },

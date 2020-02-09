@@ -11,6 +11,7 @@ dotenv.config({ path: "./config/config.env" });
 connectDB();
 
 // Route files
+const languages = require("./routes/languages");
 const categories = require("./routes/categories");
 
 // Body parser
@@ -28,7 +29,8 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-app.use("/api/v1/categories", categories);
+app.use("/api/v1/languages", languages);
+// app.use("/api/v1/categories", categories);
 
 app.use(errorHendler);
 
