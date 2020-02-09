@@ -17,12 +17,6 @@ const categories = require("./routes/categories");
 // Body parser
 const app = express();
 
-// --------------------------------
-// ------------- 6.4 --------------
-//    --   Select & Sorting   --
-// --------------------------------
-// --------------------------------
-
 app.use(express.json());
 
 if (process.env.NODE_ENV === "development") {

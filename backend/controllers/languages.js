@@ -9,7 +9,33 @@ const slugify = require("slugify");
 // @access    Public
 exports.getAllLanguages = async (req, res, next) => {
   try {
-    const languages = await Language.find(req.query);
+    let query;
+    const reqQuery = { ...req.query };
+
+    // Array with fields to exclude from reqQuery
+    const removeFields = ["select", "sort"];
+    removeFields.forEach(param => delete reqQuery[param]);
+
+    // Finding resourse - Initializing the query
+    query = Language.find(reqQuery);
+
+    // Adding select() to the query to select sertain fields
+    if (req.query.select) {
+      const fields = req.query.select.split(",").join(" ");
+      query = query.select(fields);
+    }
+
+    // Adding sort() to the query to sort resourses by...
+    // Default sorting desending createdAt (newest is first)
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
+    }
+
+    // Executing query
+    const languages = await query;
     res.status(200).json({
       success: true,
       count: languages.length,
