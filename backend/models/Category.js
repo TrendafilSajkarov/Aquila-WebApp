@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const slugify = require("slugify");
 
 const CategorySchema = new mongoose.Schema({
+  language: { type: mongoose.Schema.Types.ObjectId, ref: "Language" },
+  subcategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
   name: {
     type: String,
     unique: true,

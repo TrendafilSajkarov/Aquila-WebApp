@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use("/api/v1/languages", languages);
-// app.use("/api/v1/categories", categories);
+app.use("/api/v1/languages/:languageId/categories", categories);
 
 app.use(errorHendler);
 

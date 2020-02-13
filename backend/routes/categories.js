@@ -7,7 +7,7 @@ const {
   deleteCategory
 } = require("../controllers/categories");
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
@@ -15,7 +15,7 @@ router
   .post(createCategory);
 
 router
-  .route("/:id")
+  .route("/:categoryId")
   .get(getSingleCategory)
   .put(updateCategory)
   .delete(deleteCategory);

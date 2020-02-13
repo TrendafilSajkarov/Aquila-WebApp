@@ -1,12 +1,38 @@
 const ErrorResponse = require("../utils/errorResponse");
+const Language = require("../models/Language");
 const Category = require("../models/Category");
 
-// @desc      Get all Categories
-// @route     GET  /api/v1/categories
+const slugify = require("slugify");
+
+// @desc      Get all Categories from Language
+// @route     GET  /api/v1/languages/:languageId/categories
 // @access    Public
 exports.getAllCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find(req.query);
+    // check if language exsists
+    const language = await Language.findById(req.params.languageId);
+    if (!language) {
+      return next(
+        new ErrorResponse(
+          `Language not found with id of ${req.params.languageId}`,
+          404
+        )
+      );
+    }
+    let query;
+    query = Category.find({ language: req.params.languageId });
+    if (req.query.select) {
+      const fields = req.query.select.split(",").join(" ");
+      query = query.select(fields);
+    }
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-createdAt");
+    }
+
+    const categories = await query;
     res.status(200).json({
       success: true,
       count: categories.length,
@@ -18,28 +44,57 @@ exports.getAllCategories = async (req, res, next) => {
 };
 
 // @desc      Get single Category
-// @route     GET  /api/v1/categories/:id
+// @route     GET  /api/v1/languages/:languageId/categories/:categoryId
 // @access    Public
 exports.getSingleCategory = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) {
+    // check if language exsists
+    console.log(req.params);
+    const language = await Language.findById(req.params.languageId);
+    if (!language) {
       return next(
-        new ErrorResponse(`Category not found with id of ${req.params.id}`, 404)
+        new ErrorResponse(
+          `Language not found with id of ${req.params.languageId}`,
+          404
+        )
       );
     }
-    res.status(200).json({ success: true, data: category });
+    let query;
+    query = Category.findById({ _id: req.params.categoryId });
+    if (req.query.select) {
+      const fields = req.query.select.split(",").join(" ");
+      query = query.select(fields);
+    }
+
+    const categories = await query;
+
+    if (!categories) {
+      return next(
+        new ErrorResponse(
+          `Category not found with id of ${req.params.categoryId}`,
+          404
+        )
+      );
+    }
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories
+    });
   } catch (err) {
     next(err);
   }
 };
 
-// @desc      Post new Category
-// @route     POST  /api/v1/categories
+// @desc      Post new Category in a Language
+// @route     POST  /api/v1/languages/:languageId/categories
 // @access    Protected
 exports.createCategory = async (req, res, next) => {
   try {
-    const category = await Category.create(req.body);
+    const category = await Category.create({
+      ...req.body,
+      language: req.params.languageId
+    });
     res.status(201).json({ success: true, data: category });
   } catch (err) {
     next(err);
@@ -51,10 +106,14 @@ exports.createCategory = async (req, res, next) => {
 // @access    Protected
 exports.updateCategory = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, slug: slugify(req.body.name, { lower: true }) },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
     if (!category) {
       return next(
         new ErrorResponse(`Category not found with id of ${req.params.id}`, 404)

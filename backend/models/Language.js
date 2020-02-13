@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const ISO6391 = require("iso-639-1");
 
 const LanguageSchema = new mongoose.Schema({
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
   nameInEnglish: {
     type: String,
     required: [true, "Please add the name of the Language in English"],
