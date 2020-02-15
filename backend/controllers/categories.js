@@ -60,7 +60,10 @@ exports.getSingleCategory = async (req, res, next) => {
       );
     }
     let query;
-    query = Category.findById({ _id: req.params.categoryId });
+    query = Category.findById({ _id: req.params.categoryId }).populate({
+      path: "language",
+      select: "nameInEnglish"
+    });
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);
@@ -91,10 +94,20 @@ exports.getSingleCategory = async (req, res, next) => {
 // @access    Protected
 exports.createCategory = async (req, res, next) => {
   try {
+    const language = await Language.findById(req.params.languageId);
+    if (!language) {
+      return next(
+        new ErrorResponse(
+          `Language not found with id of ${req.params.languageId}`,
+          404
+        )
+      );
+    }
     const category = await Category.create({
       ...req.body,
       language: req.params.languageId
     });
+
     res.status(201).json({ success: true, data: category });
   } catch (err) {
     next(err);
@@ -126,14 +139,17 @@ exports.updateCategory = async (req, res, next) => {
 };
 
 // @desc      Delete Category
-// @route     DELETE  /api/v1/categories/:id
+// @route     DELETE  /api/v1/languages/:languageId/categories/:categoryId
 // @access    Protected
 exports.deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const category = await Category.findByIdAndDelete(req.params.categoryId);
     if (!category) {
       return next(
-        new ErrorResponse(`Category not found with id of ${req.params.id}`, 404)
+        new ErrorResponse(
+          `Category not found with id of ${req.params.categoryId}`,
+          404
+        )
       );
     }
     res.status(200).json({ success: true });

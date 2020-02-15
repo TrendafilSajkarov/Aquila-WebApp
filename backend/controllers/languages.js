@@ -1,8 +1,22 @@
 const ErrorResponse = require("../utils/errorResponse");
 const Language = require("../models/Language");
+const Category = require("../models/Category");
 const ISO6391 = require("iso-639-1");
 
 const slugify = require("slugify");
+
+exports.getAllCategories = async (req, res, next) => {
+  try {
+    const categories = await Category.find({});
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // @desc      Get all Languages
 // @route     GET  /api/v1/languages
@@ -51,7 +65,9 @@ exports.getAllLanguages = async (req, res, next) => {
 // @access    Public
 exports.getSingleLanguage = async (req, res, next) => {
   try {
-    const language = await Language.findById(req.params.id);
+    const language = await Language.findById(req.params.id).populate(
+      "categories"
+    );
     if (!language) {
       return next(
         new ErrorResponse(`Language not foung with ID of ${req.params.id}`, 404)
@@ -115,12 +131,13 @@ exports.updateLanguage = async (req, res, next) => {
 // @access    Private
 exports.deleteLanguage = async (req, res, next) => {
   try {
-    const language = await Language.findByIdAndDelete(req.params.id);
+    const language = await Language.findById(req.params.id);
     if (!language) {
       return next(
         new ErrorResponse(`Language not found with id of ${req.params.id}`, 404)
       );
     }
+    language.remove();
     res.status(200).json({
       success: true
     });

@@ -4,7 +4,8 @@ const {
   getSingleLanguage,
   createLanguage,
   updateLanguage,
-  deleteLanguage
+  deleteLanguage,
+  getAllCategories
 } = require("../controllers/languages");
 
 const router = express.Router();
@@ -19,5 +20,4 @@ router
   .get(getSingleLanguage)
   .put(updateLanguage)
   .delete(deleteLanguage);
-
 module.exports = router;

@@ -6,7 +6,6 @@ const CategorySchema = new mongoose.Schema({
   subcategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
   name: {
     type: String,
-    unique: true,
     maxlength: [30, "Name of Category can not be more than 30 characters"]
   },
   slug: String,
