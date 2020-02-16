@@ -65,9 +65,15 @@ exports.getAllLanguages = async (req, res, next) => {
 // @access    Public
 exports.getSingleLanguage = async (req, res, next) => {
   try {
-    const language = await Language.findById(req.params.id).populate(
-      "categories"
-    );
+    let query = Language.findById(req.params.id).populate({
+      path: "categories",
+      match: { category: undefined }
+    });
+    if (req.query.select) {
+      const fields = req.query.select.split(",").join(" ");
+      query = query.select(fields);
+    }
+    let language = await query;
     if (!language) {
       return next(
         new ErrorResponse(`Language not foung with ID of ${req.params.id}`, 404)

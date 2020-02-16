@@ -13,6 +13,8 @@ connectDB();
 // Route files
 const languages = require("./routes/languages");
 const categories = require("./routes/categories");
+const subcategories = require("./routes/subcategories");
+const allCategories = require("./controllers/allCategories");
 
 // Body parser
 const app = express();
@@ -22,9 +24,15 @@ app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
+app.get("/api/v1/categories", allCategories.getAllCat);
+app.delete("/api/v1/categories/:categoryId", allCategories.deleteCat);
+////////////////////////////////////////
 app.use("/api/v1/languages", languages);
 app.use("/api/v1/languages/:languageId/categories", categories);
+app.use(
+  "/api/v1/languages/:languageId/categories/:categoryId/subcat",
+  subcategories
+);
 
 app.use(errorHendler);
 

@@ -20,7 +20,10 @@ exports.getAllCategories = async (req, res, next) => {
       );
     }
     let query;
-    query = Category.find({ language: req.params.languageId });
+    query = Category.find({
+      category: undefined,
+      language: req.params.languageId
+    }).populate("subcategories");
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);
@@ -49,7 +52,6 @@ exports.getAllCategories = async (req, res, next) => {
 exports.getSingleCategory = async (req, res, next) => {
   try {
     // check if language exsists
-    console.log(req.params);
     const language = await Language.findById(req.params.languageId);
     if (!language) {
       return next(
@@ -61,8 +63,8 @@ exports.getSingleCategory = async (req, res, next) => {
     }
     let query;
     query = Category.findById({ _id: req.params.categoryId }).populate({
-      path: "language",
-      select: "nameInEnglish"
+      path: "language subcategories",
+      select: "name nameInEnglish"
     });
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");

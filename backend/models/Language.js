@@ -51,7 +51,7 @@ LanguageSchema.pre("remove", async function(next) {
 // Reverse populate with virtuals
 LanguageSchema.virtual("categories", {
   ref: "Category",
-  localField: "id",
+  localField: "_id",
   foreignField: "language",
   justOne: false
 });
