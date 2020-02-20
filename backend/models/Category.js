@@ -31,6 +31,16 @@ CategorySchema.pre("save", function(next) {
   next();
 });
 
+CategorySchema.pre("remove", async function(next) {
+  let subcategories = await this.model("Category").find({ category: this._id });
+  if (subcategories) {
+    subcategories.forEach(async subcategory => {
+      await subcategory.remove();
+    });
+  }
+  next();
+});
+
 // Reverse populate with virtuals
 // (you have to use it with populate("subcategories") in the controller in order to show up)
 CategorySchema.virtual("subcategories", {

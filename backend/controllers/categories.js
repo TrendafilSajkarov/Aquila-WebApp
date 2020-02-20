@@ -145,7 +145,7 @@ exports.updateCategory = async (req, res, next) => {
 // @access    Protected
 exports.deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndDelete(req.params.categoryId);
+    const category = await Category.findById(req.params.categoryId);
     if (!category) {
       return next(
         new ErrorResponse(
@@ -154,6 +154,7 @@ exports.deleteCategory = async (req, res, next) => {
         )
       );
     }
+    await category.remove();
     res.status(200).json({ success: true });
   } catch (err) {
     next(err);
