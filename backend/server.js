@@ -13,6 +13,7 @@ connectDB();
 // Route files
 const languages = require("./routes/languages");
 const categories = require("./routes/categories");
+const posts = require("./routes/posts");
 const subcategories = require("./routes/subcategories");
 const allCategories = require("./controllers/allCategories");
 
@@ -29,6 +30,7 @@ app.delete("/api/v1/categories/:categoryId", allCategories.deleteCat);
 ////////////////////////////////////////
 app.use("/api/v1/languages", languages);
 app.use("/api/v1/languages/:languageId/categories", categories);
+app.use("/api/v1/languages/:languageId/categories/:categoryId/posts", posts); // categoryId refers to category or subcategory that the post belongs to
 app.use(
   "/api/v1/languages/:languageId/categories/:categoryId/subcat",
   subcategories

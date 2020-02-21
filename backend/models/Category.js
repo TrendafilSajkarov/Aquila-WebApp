@@ -32,6 +32,12 @@ CategorySchema.pre("save", function(next) {
 });
 
 CategorySchema.pre("remove", async function(next) {
+  let posts = await this.model("Post").find({ category: this._id });
+  if (posts) {
+    posts.forEach(async post => {
+      await post.remove();
+    });
+  }
   let subcategories = await this.model("Category").find({ category: this._id });
   if (subcategories) {
     subcategories.forEach(async subcategory => {
@@ -45,6 +51,13 @@ CategorySchema.pre("remove", async function(next) {
 // (you have to use it with populate("subcategories") in the controller in order to show up)
 CategorySchema.virtual("subcategories", {
   ref: "Category",
+  localField: "_id",
+  foreignField: "category",
+  justOne: false
+});
+
+CategorySchema.virtual("posts", {
+  ref: "Post",
   localField: "_id",
   foreignField: "category",
   justOne: false

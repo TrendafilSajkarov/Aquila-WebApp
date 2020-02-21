@@ -1,6 +1,7 @@
 const ErrorResponse = require("../utils/errorResponse");
 const Language = require("../models/Language");
 const Category = require("../models/Category");
+const Post = require("../models/Post");
 
 const slugify = require("slugify");
 
@@ -23,7 +24,7 @@ exports.getAllCategories = async (req, res, next) => {
     query = Category.find({
       category: undefined,
       language: req.params.languageId
-    }).populate("subcategories");
+    }).populate("subcategories posts");
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);
@@ -63,8 +64,8 @@ exports.getSingleCategory = async (req, res, next) => {
     }
     let query;
     query = Category.findById({ _id: req.params.categoryId }).populate({
-      path: "language subcategories",
-      select: "name nameInEnglish"
+      path: "language subcategories posts",
+      select: "name nameInEnglish title"
     });
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");

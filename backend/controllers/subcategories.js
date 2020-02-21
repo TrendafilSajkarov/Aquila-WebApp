@@ -1,6 +1,7 @@
 const ErrorResponse = require("../utils/errorResponse");
 const Language = require("../models/Language");
 const Category = require("../models/Category");
+const Post = require("../models/Post");
 
 const slugify = require("slugify");
 
@@ -112,7 +113,9 @@ exports.getSingleSubcat = async (req, res, next) => {
       );
     }
     let query;
-    query = Category.findById(req.params.subcatId);
+    query = Category.findById(req.params.subcatId).populate(
+      "subcategories posts"
+    );
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);

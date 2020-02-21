@@ -44,6 +44,7 @@ LanguageSchema.pre("validate", function(next) {
 });
 
 LanguageSchema.pre("remove", async function(next) {
+  await this.model("Post").deleteMany({ language: this._id });
   await this.model("Category").deleteMany({ language: this._id });
   next();
 });
