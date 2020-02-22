@@ -2,7 +2,9 @@ const express = require("express");
 const {
   getAllSubcats,
   createSubcat,
-  getSingleSubcat
+  getSingleSubcat,
+  updateSubcat,
+  deleteSubcat
 } = require("../controllers/subcategories");
 
 const router = express.Router({ mergeParams: true });
@@ -12,6 +14,10 @@ router
   .get(getAllSubcats)
   .post(createSubcat);
 
-router.route("/:subcatId").get(getSingleSubcat);
+router
+  .route("/:subcatId")
+  .get(getSingleSubcat)
+  .put(updateSubcat)
+  .delete(deleteSubcat);
 
 module.exports = router;
