@@ -30,11 +30,18 @@ exports.getAllPosts = async (req, res, next) => {
         )
       );
     }
+    // Pagination
+    let page = parseInt(req.query.page, 10) || 1;
+    let limit = parseInt(req.query.limit, 10) || 2;
+    let startIndex = (page - 1) * limit;
+    let endIndex = page * limit;
+    let total = await Post.countDocuments({ category: req.params.categoryId });
     let query;
     query = Post.find({
       category: req.params.categoryId,
       language: req.params.languageId
     });
+    query = query.skip(startIndex).limit(limit);
     if (req.query.select) {
       const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);
@@ -47,9 +54,25 @@ exports.getAllPosts = async (req, res, next) => {
     }
 
     const posts = await query;
+
+    // Pagination result
+    const pagination = { total };
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit
+      };
+    }
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit
+      };
+    }
     res.status(200).json({
       success: true,
       count: posts.length,
+      pagination,
       data: posts
     });
   } catch (err) {
